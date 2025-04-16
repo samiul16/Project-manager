@@ -1,0 +1,374 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id                   String        @id @default(uuid())
+  teamName             String
+  productOwnerUserId   String?
+  projectManagerUserId String?
+  orgId  String
+  projectTeams         ProjectTeam[]
+  user                 User[]
+  Employee             Employee[]
+  organization         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt            DateTime     @default(now())
+  createdBy            String?
+
+  @@index([orgId])
+}
+
+model Project {
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  startDate       DateTime?
+  endDate         DateTime?
+  orgId  String
+  tasks           Task[]
+  projectTeams    ProjectTeam[]
+  attachments     Attachment[]
+  projectManagers ProjectManager[]
+  logs            Log[]
+  notificationLogs NotificationLog[]
+  createdAt       DateTime         @default(now())
+  createdBy       String?
+
+  @@index([orgId])
+}
+
+model ProjectManager {
+  id        String           @id @default(uuid())
+  orgUserId String
+  projectId String
+  orgUser   OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  createdBy String?
+
+  @@index([orgUserId, projectId])
+}
+
+model ProjectTeam {
+  id        String  @id @default(uuid())
+  teamId    String
+  projectId String
+  team      Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@index([teamId, projectId])
+}
+
+enum TaskStatus {
+  ToDo
+  WorkInProgress
+  UnderReview
+  Completed
+}
+
+enum TaskPriority {
+  Urgent
+  High
+  Medium
+  Low
+  Backlog
+}
+
+model Task {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus   @default(ToDo)
+  priority       TaskPriority @default(Backlog)
+  tags           String?
+  startDate      DateTime?
+  dueDate        DateTime?
+  points         Int?
+  projectId      String
+  authorUserId   String
+  orgId  String
+
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author         OrganizationUser            @relation("TaskAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  taskAssignments TaskAssignment[]
+  attachments     Attachment[]
+  comments        Comment[]
+  logs            Log[]
+  organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  notificationLogs   NotificationLog[]
+  createdAt       DateTime        @default(now())
+  createdBy       String?
+
+  @@index([projectId])
+  @@index([authorUserId])
+  @@index([status])
+  @@index([priority])
+  @@index([tags])
+  @@index([startDate])
+  @@index([dueDate])
+  @@index([points])
+}
+
+model TaskAssignment {
+  id     String @id @default(uuid())
+  orgUserId String
+  taskId String
+  orgUser   OrganizationUser   @relation(fields: [orgUserId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@index([orgUserId, taskId])
+  @@index([taskId])
+  @@index([orgUserId])
+}
+
+model Attachment {
+  id              String  @id @default(uuid())
+  fileURL         String
+  fileName        String?
+  taskId          String?
+  uploadedById    String?
+  projectId       String?
+  task            Task?   @relation(fields: [taskId], references: [id])
+  uploadedBy      User?   @relation(fields: [uploadedById], references: [userId])
+  project         Project? @relation(fields: [projectId], references: [id])
+  createdAt       DateTime @default(now())
+  createdBy       String?
+}
+
+model Comment {
+  id        String @id @default(uuid())
+  text      String
+  taskId    String
+  orgUserId    String
+  task      Task   @relation(fields: [taskId], references: [id])
+  orgUser   OrganizationUser   @relation(fields: [orgUserId], references: [id])
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@index([orgUserId, taskId])
+  @@index([taskId])
+}
+
+model Employee {
+  id                String  @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String
+  profilePictureUrl String?
+  position          String?
+  department        String?
+  hireDate          DateTime
+  phone             String?
+  teamId            String?
+  team              Team?   @relation(fields: [teamId], references: [id])
+  createdAt         DateTime @default(now())
+  createdBy         String?
+}
+
+model OrganizationUser {
+  id              String              @id @default(uuid())
+  userId          String
+  orgId  String
+  role            String              @default("Admin")
+  joinedAt        DateTime            @default(now())
+  user            User                @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  organization    Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  orgUserRoles    OrgUserRole[]
+  projectManagers ProjectManager[]
+  taskAssignments TaskAssignment[]
+  taskAuthor      Task[]              @relation("TaskAuthor")
+  comments        Comment[]
+  notifications   NotificationLog[]
+  createdAt       DateTime            @default(now())
+  createdBy       String?
+
+  @@unique([userId, orgId])
+  @@index([orgId])
+}
+
+model OrgUserRole {
+  id        String  @id @default(uuid())
+  orgUserId String
+  orgId     String
+  roleId    String
+  orgUser   OrganizationUser @relation(fields: [orgUserId], references: [id], onDelete: Cascade)
+  role      Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+  createdBy String?
+
+  @@unique([orgUserId, roleId])
+  @@index([orgId])
+}
+
+model User {
+  userId          String               @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String               @unique
+  phone           String?          
+  password        String?
+  createdAt       DateTime             @default(now())
+  organizationUsers OrganizationUser[]
+  attachments       Attachment[]
+  teamId            String?
+  team              Team?              @relation(fields: [teamId], references: [id])
+  profile           Profile?
+  createdBy         String?
+  whatsAppNumber String?
+
+  @@index([userId])
+  @@index([email])
+  @@index([phone])
+}
+
+model Profile {
+  id                String  @id @default(uuid())
+  userId            String  @unique
+  firstName         String
+  lastName          String
+  email             String
+  profilePictureUrl String?
+  position          String?
+  department        String?
+  hireDate          DateTime
+  phone             String?
+  user              User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  createdBy         String?
+
+  @@index([userId])
+}
+
+enum RoleName {
+  Admin
+  Employee
+  User
+}
+
+model Role {
+  id           String        @id @default(uuid())
+  name         RoleName      @unique @default(Admin)
+  orgUserRoles OrgUserRole[]
+  createdAt    DateTime      @default(now())
+  createdBy    String?
+  
+  @@index([name])
+}
+
+model Organization {
+  id                  String                @id @default(uuid())
+  name                String
+  subdomain           String                @unique
+  createdAt           DateTime              @default(now())
+  organizationUsers   OrganizationUser[]
+  settings            OrganizationSettings?
+  teams               Team[]
+  tasks               Task[]
+  createdBy           String?
+
+  @@index([subdomain])
+  @@index([id])
+}
+
+model OrganizationSettings {
+  id              String       @id @default(uuid())
+  organization    Organization @relation(fields: [orgId], references: [id])
+  orgId  String       @unique
+  allowGuests     Boolean      @default(false)
+  timezone        String       @default("UTC")
+  createdAt       DateTime     @default(now())
+  createdBy       String?
+
+  @@index([orgId])
+}
+
+enum LogTypeEnum {
+ createLog
+ changeLog
+ deleteLog 
+}
+
+enum LogContextEnum {
+  task
+  project
+  organization
+  user
+}
+
+model Log {
+  id        String  @id @default(uuid())
+  type      LogTypeEnum
+  orgId  String
+  oldData   String?
+  newData   String?
+  oldId     String?
+  newId     String?
+  taskId    String?
+  context   LogContextEnum
+  projectId String
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  task Task? @relation(fields: [taskId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
+
+  @@index([type])
+  @@index([context])
+  @@index([projectId])
+  @@index([oldId])
+  @@index([newId])
+  @@index([taskId])
+}
+
+enum NotificationLogTypeEnum {
+  sms
+  email
+  message_channel
+}
+
+enum NotificationLogContextEnum {
+  task
+  project
+  organization
+  user
+}
+
+enum NotificationLogChannelEnum {
+  whatsApp
+}
+
+model NotificationLog {
+  id        String  @id @default(uuid())
+  type      NotificationLogTypeEnum
+  context   NotificationLogContextEnum
+  orgId  String
+  receiverId String
+  content   String
+  taskId    String?
+  projectId String?
+  createdAt DateTime @default(now())
+  createdBy String?
+  toEmail String?
+  toPhone String?
+  channel NotificationLogChannelEnum?
+
+  task Task? @relation(fields: [taskId], references: [id])
+  project Project? @relation(fields: [projectId], references: [id])
+  receiver OrganizationUser @relation(fields: [receiverId], references: [id])
+
+  @@index([type])
+  @@index([context])
+  @@index([projectId])
+  @@index([receiverId])
+  @@index([taskId])
+}

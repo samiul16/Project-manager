@@ -1,0 +1,72 @@
+[
+  {
+    "id": "8ccab9fa-4db6-435e-9ec5-cff131dc2cd6",
+    "name": "Apollo",
+    "description": "A space exploration project.",
+    "startDate": "2023-01-01T00:00:00Z",
+    "endDate": "2023-12-31T00:00:00Z"
+  },
+  {
+    "id": "6abab64c-2e5d-48f6-88e8-8337b8ac7f60",
+    "name": "Beacon",
+    "description": "Developing advanced navigation systems.",
+    "startDate": "2023-02-01T00:00:00Z",
+    "endDate": "2023-10-15T00:00:00Z"
+  },
+  {
+    "id": "66c3c0a1-5820-44d6-9e5f-f6cac4da6d98",
+    "name": "Catalyst",
+    "description": "A project to boost renewable energy use.",
+    "startDate": "2023-03-05T00:00:00Z",
+    "endDate": "2024-03-05T00:00:00Z"
+  },
+  {
+    "id": "02242969-caa9-4ae5-9bcc-336a8fd56415",
+    "name": "Delta",
+    "description": "Delta project for new software development techniques.",
+    "startDate": "2023-01-20T00:00:00Z",
+    "endDate": "2023-09-20T00:00:00Z"
+  },
+  {
+    "id": "9787230d-129d-4377-8225-51f43000b05e",
+    "name": "Echo",
+    "description": "Echo project focused on AI advancements.",
+    "startDate": "2023-04-15T00:00:00Z",
+    "endDate": "2023-11-30T00:00:00Z"
+  },
+  {
+    "id": "14e77441-1a7a-4af4-a111-16a9b13a105a",
+    "name": "Foxtrot",
+    "description": "Exploring cutting-edge biotechnology.",
+    "startDate": "2023-02-25T00:00:00Z",
+    "endDate": "2023-08-25T00:00:00Z"
+  },
+  {
+    "id": "98a1c389-a5c5-4314-811a-db9f906a8f8c",
+    "name": "Golf",
+    "description": "Development of new golf equipment using AI.",
+    "startDate": "2023-05-10T00:00:00Z",
+    "endDate": "2023-12-10T00:00:00Z"
+  },
+  {
+    "id": "5dfade04-4e32-4f23-bfe6-0adc437e5198",
+    "name": "Hotel",
+    "description": "Hotel management system overhaul.",
+    "startDate": "2023-03-01T00:00:00Z",
+    "endDate": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "73ea58c7-2b0c-446d-ab4b-206388e6e5f1",
+    "name": "India",
+    "description": "Telecommunication infrastructure upgrade.",
+    "startDate": "2023-06-01T00:00:00Z",
+    "endDate": "2023-12-01T00:00:00Z"
+  },
+  {
+    "id": "28c50460-df95-49a4-8949-eeb57e37b858",
+    "name": "Juliet",
+    "description": "Initiative to enhance cyber-security measures.",
+    "startDate": "2023-07-01T00:00:00Z",
+    "endDate": "2024-02-01T00:00:00Z"
+  }
+]
