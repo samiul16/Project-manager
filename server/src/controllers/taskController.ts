@@ -285,7 +285,15 @@ export const getTaskById = async (
         author: true,
         comments: true,
         attachments: true,
-        taskAssignments: true,
+        taskAssignments: {
+          include: {
+            orgUser: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
     res.status(200).json(task);

@@ -104,6 +104,7 @@ model Task {
   logs            Log[]
   organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   notificationLogs   NotificationLog[]
+  taskChecklists  TaskChecklist[]
   createdAt       DateTime        @default(now())
   createdBy       String?
 
@@ -370,5 +371,18 @@ model NotificationLog {
   @@index([context])
   @@index([projectId])
   @@index([receiverId])
+  @@index([taskId])
+}
+
+model TaskChecklist {
+  id        String  @id @default(uuid())
+  task      Task    @relation(fields: [taskId], references: [id])
+  taskId    String
+  orgId  String
+  title      String
+  completed Boolean @default(false)
+  createdAt DateTime @default(now())
+  createdBy String?
+
   @@index([taskId])
 }
